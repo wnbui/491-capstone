@@ -1,42 +1,55 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+.outer-div {
+  background-color: orange;
+  border: 1px solid black;
+  width: 600px;
+  height: 500px;
+  margin: 50px;
+}
+
+.box {
+  border: 1px solid black;
   text-align: center;
+  width: 100px;
+  padding: 10px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.box a {
+  text-decoration: none;
+  color: black;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.box a:visited {
+  text-decoration: none;
+  color: black;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.inner-div {
+  float: right;
+  background-color: lightgray;
+  width: 470px;
+  height: 460px;
 }
 
-.card {
-  padding: 2em;
+.inner-div2 {
+  background-color: white;
+  margin: 25px;
+  width: 94%;
+  height: 88%;
 }
 
-.read-the-docs {
-  color: #888;
+.team-header {
+  float: right;
+}
+
+.team-icon {
+  height: 25px;
+  width: 25px;
+}
+
+.navigation-table {
+  float: left;
+}
+
+.content-center {
+  text-align: center;
 }
