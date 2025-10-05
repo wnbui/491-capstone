@@ -55,6 +55,10 @@ class FriendTable(declarative_base()):
     first_friend = relationship("User", foreign_keys = [first_friend_id])
     second_friend = relationship("User", foreign_keys = [second_friend_id])
 
+    def __init__(self, first_friend_id, second_friend_id):
+        self.first_friend_id = first_friend_id
+        self.second_friend_it = second_friend_id
+
 class User(declarative_base()):
     __tablename__ = 'users'
 
@@ -72,6 +76,13 @@ class User(declarative_base()):
     friends = relationship('User', secondary = 'friend_table', primaryjoin = id == FriendTable.first_friend_id, secondaryjoin = id == FriendTable.second_friend_id, backref = 'users_friends')
     tasks = relationship("Task", back_populates = "creator")
     assigned_tasks = relationship("Task", back_populates = "assignee")
+    settings = relationship("Settings", back_populates = "user")
+
+    def __init__(self, username, email, password, session):
+        self.username = username
+        self.email = email
+        self.set_password(password)
+        session.commit()
 
     def add_friend(self, friend):
         if friend not in self.friends:
@@ -89,12 +100,21 @@ class User(declarative_base()):
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
+    def change_password(self, new_password, session):
+        self.set_password(new_password)
+        session.commit()
+
 class Team(declarative_base()):
     __tablename__ = 'teams'
 
     id = Column(Integer, primary_key = True)
+    name = Column(String(100), unique = True, default = "My Team")
+
     members = relationship("User", back_populates = "teams")
     projects = relationship("Project", back_populates = "team")
+
+    def __init__(self, name):
+        self.name = name
 
     def add_member(self, user):
         if user not in self.members:
@@ -112,6 +132,10 @@ class UserTeamTable(declarative_base()):
     user_id = Column(Integer, ForeignKey('users.id'), primary_key = True)
     team_id = Column(Integer, ForeignKey('teams.id'), primary_key = True)
 
+    def __init__(self, user_id, team_id):
+        self.user_id = user_id
+        self.team_id = team_id
+
 class Project(declarative_base()):
     __tablename__ = 'projects'
 
@@ -123,6 +147,9 @@ class Project(declarative_base()):
     tasks = relationship("Task", back_populates = "projects")
     roles = relationship("UserRoleProjectTable", back_populates = "project")
     creator = relationship("User", back_populates = "project")
+
+    def __init__(self, name):
+        self.name = name
 
     def add_task(self,task):
         self.tasks.append(task)
@@ -140,6 +167,10 @@ class Role(declarative_base()):
     permissions = relationship("Permission", back_populates = "role")
     tasks = relationship("Task", secondary = "task_role_access", back_populates = "roles")
     users = relationship("User", secondary = "user_role", back_populates = "roles")
+
+    def __init__(self, name, description):
+        self.name = name
+        self.decsription = description
 
 class Permission(declarative_base()):
     # Could do away with this table and connect the permissions to the Role class a different way or just incorporate more directly, this is pretty messy so I wouldn't blame you
@@ -163,6 +194,17 @@ class Permission(declarative_base()):
 
     role = relationship("Role", back_populates = "permissions")
 
+    def __init__(self, role_id, add_tasks, edit_tasks, add_events, edit_events, add_roles, edit_roles, assign_tasks, assign_roles):
+        self.role_id = role_id
+        self.add_tasks = add_tasks
+        self.edit_tasks = edit_tasks
+        self. add_events = add_events
+        self.edit_events = edit_events
+        self.add_roles = add_roles
+        self.edit_roles = edit_roles
+        self.assign_tasks = assign_tasks
+        self.assign_roles = assign_roles
+
 # An association table. Could definitely be replaced by db.Table for simplicity's sake later on
 class UserRoleProjectTable(declarative_base()):
     __tablename__ = 'user_role_project_table'
@@ -175,6 +217,11 @@ class UserRoleProjectTable(declarative_base()):
     user = relationship("User", back_populates = "roles")
     role = relationship("Role")
     project = relationship("Project", back_populates = "user_role_project_table")
+
+    def __init__(self, user_id, role_id, project_id):
+        self.user_id = user_id
+        self.role_id = role_id
+        self.project_id = project_id
 
 class TaskState(ABC):
     @abstractmethod
@@ -260,6 +307,10 @@ class TaskRoleAccess(declarative_base()):
     task = relationship("Task", back_populates = "roles")
     role = relationship("Role", back_populates = "tasks")
 
+    def __init__(self, task_id, role_id):
+        self.task_id = task_id
+        self.role_id = role_id
+
 class UserRole(declarative_base()):
     __tablename__ = 'user_role'
 
@@ -269,6 +320,10 @@ class UserRole(declarative_base()):
 
     user = relationship("User", back_populates = "roles")
     role = relationship("Role", back_populates = "users")
+
+    def __init__(self, user_id, role_id):
+        self.user_id = user_id
+        self.role_id = role_id
     
 class Notification(declarative_base()):
     __tablename__ = 'notifications'
@@ -283,17 +338,32 @@ class Notification(declarative_base()):
 
     recipient = relationship("User", back_populates = "notifications")
 
+    def __init__(self, source, contents, automated, send_time, receive_time, received):
+        self.source = source
+        self.contents = contents
+        self.automated = automated
+        self.send_time = send_time
+        self.receive_time = receive_time
+        self.received = received
+
 class CreatedFile(declarative_base()):
     __tablename__ = 'created_files'
 
     id = Column(Integer, primary_key = True)
     name = Column(String(50), unique = True, nullable = False)
-    contents = Column(Text, nullable = False)
     type = Column(String(50), nullable = False) # File type
+    contents = Column(Text, nullable = False)
     update_time = Column(DateTime, default = datetime.now(), onupdate = datetime.now())
     creator_id = Column(Integer, ForeignKey('user.id'), nullable = False)
 
     creator = relationship("User", back_populates = "edited_text_files")
+
+    def __init__(self, name, type, contents, update_time, creator):
+        self.name = name
+        self.type = type
+        self.contents = contents
+        self.update_time = update_time
+        self.creator = creator
 
 class UploadedFile(declarative_base()):
     __tablename__ = 'uploaded_files'
@@ -307,9 +377,11 @@ class UploadedFile(declarative_base()):
 
     uploader = relationship("User", back_populates = "uploaded_files")
 
-    def __init__(self, name, type, uploader):
+    def __init__(self, name, type, upload_time, path, uploader):
         self.name = name
         self.type = type
+        self.upload_time = upload_time
+        self.path = path
         self.uploader = uploader
         self.storage_strategy = self.choose_storage_strategy()
 
@@ -366,3 +438,30 @@ class Event(declarative_base()):
     creator_id = Column(Integer, ForeignKey('users.id'), nullable = False)
 
     creator = relationship("User", back_populates = "events")
+
+    def __init__(self, name, description, start, end, creation_time, creator):
+        self.name = name
+        self.description = description
+        self.start = start
+        self.end = end
+        self.creation_time = creation_time
+        self.creator = creator
+
+class Settings(declarative_base()):
+    __tablename__ = 'settings'
+
+    id = Column(Integer, primary_key = True)
+    language = Column(String(20), default = 'english')
+    timezone = Column(String(20), default = 'UTC')
+    event_creation_notif = Column(Boolean, default = True)
+    task_creation_notif = Column(Boolean, default = True)
+    deadline_notif = Column(Boolean, default = True)
+
+    user = relationship("User", back_populates = "settings")
+
+    def __init__(self, language, timezone, event_creation_notif, task_creation_notif, deadline_notif):
+        self.language = language
+        self.timezone = timezone
+        self.event_creation_notif = event_creation_notif
+        self.task_creation_notif = task_creation_notif
+        self.deadline_notif = deadline_notif
