@@ -9,11 +9,14 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
+from register import register_bp
+
 import os
 import boto3
 from abc import ABC, abstractmethod
 
 app = Flask(__name__)
+app.register_blueprint(register_bp)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
