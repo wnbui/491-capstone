@@ -1,23 +1,13 @@
-# Core framework
 Flask>=3.0.0
-
-# Database + ORM
 Flask-SQLAlchemy>=3.1.1
 SQLAlchemy>=2.0.0
 PyMySQL>=1.1.0
-
-# Data validation
 pydantic>=2.5.0
 pydantic[email]>=2.5.0
-
-# Authentication + security
 PyJWT>=2.8.0
 Werkzeug>=3.0.0
-
-# CORS (frontend integration)
 Flask-Cors>=4.0.0
-
-# Environment management
 python-dotenv>=1.0.0
-
 cryptography>=42.0.0
+Flask-Migrate>=4.0.7
+alembic>=1.13.2
