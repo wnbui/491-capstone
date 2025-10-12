@@ -4,6 +4,7 @@ from datetime import datetime
 
 class RegisterIn(BaseModel):
     username: str = Field(min_length=3, max_length=64)
+    name: str = Field(min_length=3, max_length=128)
     email: EmailStr
     password: str = Field(min_length=8)
     role: Literal["user", "admin"] = "user"
@@ -16,6 +17,7 @@ class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     username: str
+    name: str
     email: EmailStr
     role: str
     created_at: datetime

@@ -1,9 +1,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_migrate import Migrate
 from config import Config
 
 db = SQLAlchemy()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -12,10 +14,7 @@ def create_app():
     # Enable CORS for frontend
     CORS(app, resources={r"/api/*": {"origins": Config.CORS_ORIGINS.split(",")}})
     db.init_app(app)
-
-    with app.app_context():
-        from .models import User, Project
-        db.create_all()
+    migrate.init_app(app, db)
 
     # Register routes
     from .routes.auth import auth_bp

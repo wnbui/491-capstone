@@ -44,6 +44,7 @@ def register(body: RegisterIn):
 
     user = User(
         username=body.username,
+        name=body.name,
         email=body.email,
         password_hash=generate_password_hash(body.password),
         role=body.role,
