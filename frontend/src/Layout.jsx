@@ -27,7 +27,7 @@ export const Layout = ({ children, pageTitle }) => {
         <tbody>
           <tr>
             <td className="box">
-              <Link to="/">NOTES</Link>
+              <Link to="/notes">NOTES</Link>
             </td>
           </tr>
           <tr>
@@ -36,18 +36,17 @@ export const Layout = ({ children, pageTitle }) => {
             </td>
           </tr>
           <tr>
-            <td className="box">
-              <a href="#">PLANNER</a>
+            <td className="box"><Link to="/planner">PLANNER</Link>
             </td>
           </tr>
           <tr>
             <td className="box">
-              <a href="#">PROJECT<br />MANAGER</a>
+              <Link to="/project-manager">PROJECT<br />MANAGER</Link>
             </td>
           </tr>
           <tr>
             <td className="box">
-              <a href="#">FILES</a>
+            <Link to="/files">FILES</Link>
             </td>
           </tr>
         </tbody>
