@@ -81,3 +81,9 @@ def login(body: LoginIn):
 @token_required
 def me(current_user: User):
     return jsonify(UserOut.model_validate(current_user).model_dump())
+
+@auth_bp.route("/logout", methods=["POST"])
+@token_required
+def logout(current_user):
+    """Call front end to delete JWT"""
+    return jsonify({"message": "User logged out successfully."}), 200
