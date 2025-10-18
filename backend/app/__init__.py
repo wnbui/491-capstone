@@ -22,7 +22,7 @@ def create_app():
     # Register routes
     from .routes.auth import auth_bp
     from .routes.projects import projects_bp
-    from .routes.task import tasks_bp
+    from .routes.tasks import tasks_bp
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(projects_bp, url_prefix="/api/projects")
