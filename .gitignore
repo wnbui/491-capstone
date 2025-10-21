@@ -134,6 +134,8 @@ env.bak/
 venv.bak/
 backend/.env
 frontend/.env
+backend/.venv
+frontend/.venv
 
 # Spyder project settings
 .spyderproject
@@ -203,6 +205,8 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+testing/node_modules/
+frontend/node_modules/
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
