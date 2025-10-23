@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Login = () => {
+export const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -50,5 +50,3 @@ const Login = () => {
     </div>
   );
 };
-
-export default Login;
