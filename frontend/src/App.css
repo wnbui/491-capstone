@@ -1,9 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
 .outer-div {
   background-color: orange;
   border: 1px solid black;
-  width: 600px;
-  height: 500px;
-  margin: 50px;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 15px;
 }
 
 .box {
@@ -11,6 +28,7 @@
   text-align: center;
   width: 100px;
   padding: 10px;
+  border-radius: 8px;
 }
 
 .box a {
@@ -24,32 +42,44 @@
 }
 
 .inner-div {
-  float: right;
+  flex: 1;
   background-color: lightgray;
-  width: 470px;
-  height: 460px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 8px;
+  height: calc(100vh - 80px); 
+}
+
+.content-center {
+  text-align: center;
+  flex-shrink: 0;
+  padding: 10px;
+  border-bottom: 1px solid black;
+  font-weight: bold;
 }
 
 .inner-div2 {
+  flex: 1;
   background-color: white;
-  margin: 25px;
-  width: 94%;
-  height: 88%;
+  margin: 15px;
+  overflow-y: auto;
+  color: black;
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .team-header {
-  float: right;
+  float: left;
 }
 
 .team-icon {
   height: 25px;
   width: 25px;
+  border-radius: 30px;
 }
 
 .navigation-table {
   float: left;
-}
-
-.content-center {
-  text-align: center;
+  padding-right: 20px;
 }
