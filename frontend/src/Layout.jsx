@@ -15,8 +15,12 @@ export const Layout = ({ children, pageTitle }) => {
         <img src="/images/person_icon.jpg" className="team-icon" alt="Person" />
         <img src="/images/add_icon.jpg" className="team-icon" alt="Add" />
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <img src="/images/email_icon.jpg" className="team-icon" alt="Email" />
-        <img src="/images/settings_icon.png" className="team-icon" alt="Settings" />
+        <Link to="/messages">
+          <img src="/images/email_icon.jpg" className="team-icon" alt="Email" />
+        </Link>
+        <Link to="/settings">
+          <img src="/images/settings_icon.png" className="team-icon" alt="Settings" />
+        </Link>
         <img src="/images/person_icon.jpg" className="team-icon" alt="Person" />
       </div>
       
@@ -25,16 +29,6 @@ export const Layout = ({ children, pageTitle }) => {
       {/* Navigation Menu */}
       <table className="navigation-table">
         <tbody>
-          <tr>
-            <td className="box">
-              <Link to="/">NOTES</Link>
-            </td>
-          </tr>
-          <tr>
-            <td className="box">
-              <Link to="/messages">MESSAGES</Link>
-            </td>
-          </tr>
           <tr>
             <td className="box">
               <Link to="/planner">PLANNER</Link>

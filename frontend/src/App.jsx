@@ -4,7 +4,8 @@ import { Messages } from './pages/Messages';
 import { Planner } from './pages/Planner';
 import { ProjectManager } from './pages/Projmanager';
 import { Files } from './pages/Files';
-import { Login } from './components/Login'
+import { Login } from './components/Login';
+import { Settings} from './pages/Settings';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/projmanager" element={<ProjectManager />} />
         <Route path="/files" element={<Files />} />  
         <Route path="/login" element={<Login />} />     
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </Router>
   );
