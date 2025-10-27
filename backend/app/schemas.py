@@ -36,7 +36,7 @@ ProjectStatus = Literal["planned", "active", "on_hold", "completed", "archived"]
 class ProjectCreateIn(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     description: Optional[str] = None
-    status: ProjectStatus = "active"
+    status: ProjectStatus = "planned"
 
 class ProjectUpdateIn(BaseModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=128)
