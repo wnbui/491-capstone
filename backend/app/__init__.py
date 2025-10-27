@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from flask import Flask
+from flask import Flask, request, make_response
 from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
 from flask_migrate import Migrate
 from config import Config
 
@@ -13,9 +12,6 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Enable CORS for frontend
-    CORS(app, resources={r"/api/*": {"origins": Config.CORS_ORIGINS.split(",")}})
-    
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -27,5 +23,27 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(projects_bp, url_prefix="/api/projects")
     app.register_blueprint(tasks_bp, url_prefix="/api/tasks")
+
+    # Manual CORS headers on EVERY response
+    @app.after_request
+    def add_cors_headers(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, x-access-token, Authorization'
+        return response
+
+    # Handle OPTIONS requests
+    @app.before_request
+    def handle_preflight():
+        if request.method == "OPTIONS":
+            response = make_response()
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, x-access-token, Authorization'
+            return response
+
+    @app.route('/test')
+    def test():
+        return {'message': 'test route'}
 
     return app
