@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -51,3 +52,52 @@ const Login = () => {
 };
 
 export default Login;
+=======
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+
+export const Login = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      const res = await axios.post('http://127.0.0.1:5000/api/auth/login', {
+        username,
+        password
+      });
+
+      const { token } = res.data;
+      localStorage.setItem('token', token);
+      navigate('/notes');
+
+    } catch (err) {
+      const msg = err.response?.data?.error || err.response?.data?.ERROR || 'Login failed';
+      setError(msg);
+      // Optionally redirect if user not found
+      if (msg.toLowerCase().includes('user not found')) {
+        navigate('/register', { state: { prefillUsername: username } });
+      }
+    }
+  };
+
+  return (
+    <div style={{ padding: '20px', maxWidth: '300px', margin: '50px auto', border: '1px solid #ccc', borderRadius: '5px' }}>
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        <input placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required style={{ width: '100%', padding: '8px', margin: '5px 0' }} />
+        <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ width: '100%', padding: '8px', margin: '5px 0' }} />
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Login</button>
+      </form>
+      <p style={{ marginTop: '10px' }}>Don't have an account? <Link to="/register">Create Account</Link></p>
+    </div>
+  );
+};
+>>>>>>> Stashed changes
