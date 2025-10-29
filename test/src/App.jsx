@@ -3,9 +3,11 @@ import { AuthProvider } from './contexts/AuthContext';
 import { AuthGuard } from './components/layout/AuthGuard';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { DashboardPage } from './pages/DashboardPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('login');
+  const [currentProjectId, setCurrentProjectId] = useState(null);
 
   const navigate = (page, projectId = null) => {
     setCurrentPage(page);
@@ -21,6 +23,9 @@ function App() {
       
       case 'register':
         return <RegisterPage onNavigate={navigate} />;
+      
+      case 'main':
+        return <DashboardPage onNavigate={navigate} />;
       
       default:
         return <LoginPage onNavigate={navigate} />;
