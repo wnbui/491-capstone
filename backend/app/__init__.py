@@ -15,6 +15,10 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    # 🔥 FIX: Import models.py (not models/user.py)
+    with app.app_context():
+        from . import models
+    
     # Register routes
     from .routes.auth import auth_bp
     from .routes.projects import projects_bp
@@ -24,7 +28,7 @@ def create_app():
     app.register_blueprint(projects_bp, url_prefix="/api/projects")
     app.register_blueprint(tasks_bp, url_prefix="/api/tasks")
 
-    # Manual CORS headers on EVERY response
+    # Manual CORS headers
     @app.after_request
     def add_cors_headers(response):
         response.headers['Access-Control-Allow-Origin'] = '*'
@@ -32,7 +36,6 @@ def create_app():
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, x-access-token, Authorization'
         return response
 
-    # Handle OPTIONS requests
     @app.before_request
     def handle_preflight():
         if request.method == "OPTIONS":
