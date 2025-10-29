@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FolderKanban } from 'lucide-react';
+import { Orbit } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Input } from '../components/common/Input';
 import { Button } from '../components/common/Button';
@@ -24,9 +24,9 @@ export const LoginPage = ({ onNavigate }) => {
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-30 h-30 bg-blue-700 rounded-full mb-4 mt-4">
-            <FolderKanban className="text-white" size={64} />
+            <Orbit className="text-white" size={64} />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 p-2.5">Welcome Back to</h2>
+          <h2 className="text-3xl font-bold text-gray-600 p-2.5">Welcome Back to</h2>
           <h1 className="font-serif font-bold text-8xl text-shadow-lg text-orange-700 p-2.5">unison</h1>
           <p className="text-gray-600 mt-2 pt-6">Sign in to manage your projects</p>
         </div>

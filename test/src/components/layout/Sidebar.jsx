@@ -11,6 +11,7 @@ export const Sidebar = ({ activePage, onNavigate }) => {
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen">
+      <div className="pt-5"></div>
       <nav className="p-4 space-y-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -22,8 +23,8 @@ export const Sidebar = ({ activePage, onNavigate }) => {
               onClick={() => onNavigate(item.page)}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
                 isActive
-                  ? 'bg-indigo-50 text-indigo-600'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'bg-blue-100 text-orange-700'
+                  : 'text-blue-600 hover:bg-blue-100'
               }`}
             >
               <Icon size={20} />

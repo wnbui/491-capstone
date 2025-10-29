@@ -75,6 +75,7 @@ export const RegisterPage = ({ onNavigate }) => {
           <Input
             label="Full Name"
             name="full_name"
+            placeholder="Your Name"
             value={formData.full_name}
             onChange={handleChange}
             required
@@ -84,6 +85,7 @@ export const RegisterPage = ({ onNavigate }) => {
           <Input
             label="Username"
             name="username"
+            placeholder="MyUsername"
             value={formData.username}
             onChange={handleChange}
             required
@@ -94,6 +96,7 @@ export const RegisterPage = ({ onNavigate }) => {
             label="Email"
             type="email"
             name="email"
+            placeholder="example@email.com"
             value={formData.email}
             onChange={handleChange}
             required
@@ -103,6 +106,7 @@ export const RegisterPage = ({ onNavigate }) => {
             label="Password"
             type="password"
             name="password"
+            placeholder="•••••••••"
             value={formData.password}
             onChange={handleChange}
             required
@@ -113,6 +117,7 @@ export const RegisterPage = ({ onNavigate }) => {
             label="Confirm Password"
             type="password"
             name="confirmPassword"
+            placeholder="•••••••••"
             value={formData.confirmPassword}
             onChange={handleChange}
             required
