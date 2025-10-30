@@ -81,7 +81,7 @@ Backend will run on: **http://localhost:5000**
 
 ```bash
 # Open new terminal
-cd project-manager-frontend
+cd test
 
 # Install dependencies
 npm install
@@ -103,5 +103,5 @@ Frontend will run on: **http://localhost:5173**
 6. **Manage**: Drag tasks, update statuses, and track progress!
 
 ## Log in as an existing user from the existing database
-All users have the same password (**Password123!**). Log in using any of the 10 existing users from the database.
+All users have the same test password (**Password123!**). Log in using any of the 10 existing users from the database.
 
