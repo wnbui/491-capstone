@@ -130,4 +130,39 @@ export const deleteTask = async (taskId, token) => {
   return response.data;
 };
 
+export const getNotes = async (token) => {
+  const response = await api.get('/notes', {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
+export const getNote = async (noteId, token) => {
+  const response = await api.get(`/notes/${noteId}`, {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
+export const createNote = async (noteData, token) => {
+  const response = await api.post('/notes', noteData, {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
+export const updateNote = async (noteId, noteData, token) => {
+  const response = await api.patch(`/notes/${noteId}`, noteData, {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
+export const deleteNote = async (noteId, token) => {
+  const response = await api.delete(`/notes/${noteId}`, {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
 export default api;

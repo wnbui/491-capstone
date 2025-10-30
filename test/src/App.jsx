@@ -4,6 +4,7 @@ import { AuthGuard } from './components/layout/AuthGuard';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { NotesPage } from './pages/NotesPage'; 
 
 function App() {
   const [currentPage, setCurrentPage] = useState('login');
@@ -26,6 +27,9 @@ function App() {
       
       case 'main':
         return <DashboardPage onNavigate={navigate} />;
+      
+      case 'notes':
+        return <NotesPage onNavigate={navigate} />;
       
       default:
         return <LoginPage onNavigate={navigate} />;

@@ -80,3 +80,22 @@ class TaskOut(BaseModel):
     project_id: int
     created_at: datetime
     updated_at: datetime
+
+class NoteCreateIn(BaseModel):
+    title: str = Field(default="Untitled Document")
+    content: Optional[str] = Field(default="")
+
+class NoteUpdateIn(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+
+class NoteOut(BaseModel):
+    id: int
+    title: str
+    content: Optional[str]
+    owner_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

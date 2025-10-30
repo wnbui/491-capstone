@@ -19,10 +19,13 @@ def create_app():
     from .routes.auth import auth_bp
     from .routes.projects import projects_bp
     from .routes.tasks import tasks_bp
+    from .routes.notes import notes_bp
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(projects_bp, url_prefix="/api/projects")
     app.register_blueprint(tasks_bp, url_prefix="/api/tasks")
+    app.register_blueprint(notes_bp, url_prefix="/api/notes")
+
 
     # Manual CORS headers on EVERY response
     @app.after_request
