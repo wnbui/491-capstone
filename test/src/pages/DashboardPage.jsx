@@ -58,7 +58,7 @@ export const DashboardPage = ({ onNavigate }) => {
           <div className="max-w-7xl mx-auto">
             <div className="mb-12">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-blue-700 flex items-center space-x-2">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
                   <FolderKanban size={28} />
                   <span>Projects</span>
                 </h2>
