@@ -130,8 +130,12 @@ export const deleteTask = async (taskId, token) => {
   return response.data;
 };
 
-export const getNotes = async (token) => {
-  const response = await api.get('/notes', {
+//Notes API 
+export const getNotes = async (token, projectId = null) => {
+  const params = new URLSearchParams();
+  if (projectId) params.append('project_id', projectId);
+  
+  const response = await api.get(`/notes?${params.toString()}`, {
     headers: getAuthHeader(token),
   });
   return response.data;

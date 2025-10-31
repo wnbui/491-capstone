@@ -468,3 +468,5 @@ class Settings(declarative_base()):
         self.event_creation_notif = event_creation_notif
         self.task_creation_notif = task_creation_notif
         self.deadline_notif = deadline_notif
+
+# Working on the Notes addition 

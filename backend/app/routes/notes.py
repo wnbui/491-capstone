@@ -15,7 +15,8 @@ def create_note(current_user, body: NoteCreateIn):
     note = Note(
         title=body.title, 
         content=body.content, 
-        owner_id=current_user.id
+        owner_id=current_user.id,
+        project_id=body.project_id
     )
     db.session.add(note)
     db.session.commit()

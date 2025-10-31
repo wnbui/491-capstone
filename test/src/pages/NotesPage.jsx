@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getNotes, createNote as createNoteAPI, updateNote, deleteNote as deleteNoteAPI } from '../services/api';
+import { getNotes, createNote as createNoteAPI, updateNote, deleteNote as deleteNoteAPI, getProjects } from '../services/api';
 import { FileText, Trash2, Plus, Search, Check, AlertCircle, Bold, Italic, Underline, List, ListOrdered, BookOpen } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Header } from '../components/layout/Header';
@@ -16,24 +16,55 @@ export const NotesPage = ({ onNavigate }) => {
   const [autoSaveTimer, setAutoSaveTimer] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [projects, setProjects] = useState([]);
   const contentEditableRef = useRef(null);
 
   useEffect(() => {
-    loadNotes();
+    const init = async () => {
+      await loadProjects();
+      await loadNotes();
+    };
+    init();
   }, []);
+
+  useEffect(() => {
+    if (projects.length > 0) {
+      loadNotes();
+    }
+  }, [selectedProject]);
+
+  useEffect(() => {
+    if (currentNote && contentEditableRef.current) {
+      contentEditableRef.current.innerHTML = currentNote.content || '';
+    }
+  }, [currentNote?.id]);
+
+  const loadProjects = async () => {
+    try {
+      const data = await getProjects(token);
+      setProjects(data || []);
+    } catch (error) {
+      console.error('Failed to load projects:', error);
+      setProjects([]);
+    }
+  };
 
   const loadNotes = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getNotes(token);
-      setNotes(data);
-      if (data.length > 0 && !currentNote) {
+      const data = await getNotes(token, selectedProject);
+      setNotes(data || []);
+      if (data && data.length > 0 && !currentNote) {
         setCurrentNote(data[0]);
+      } else if (!data || data.length === 0) {
+        setCurrentNote(null);
       }
     } catch (error) {
       console.error('Failed to load notes:', error);
       setError('Failed to load notes. Make sure your Flask server is running.');
+      setNotes([]);
     } finally {
       setLoading(false);
     }
@@ -46,7 +77,8 @@ export const NotesPage = ({ onNavigate }) => {
     try {
       await updateNote(note.id, {
         title: note.title,
-        content: note.content
+        content: note.content,
+        project_id: note.project_id
       }, token);
       setIsSaving(false);
       setLastSaved(new Date());
@@ -70,10 +102,58 @@ export const NotesPage = ({ onNavigate }) => {
     setAutoSaveTimer(timer);
   };
 
+  const handleNoteProjectChange = async (noteId, projectId) => {
+    const noteToUpdate = notes.find(n => n.id === noteId);
+    if (!noteToUpdate) return;
+
+    // Convert both to comparable values
+    const currentProjectId = noteToUpdate.project_id === null ? '' : String(noteToUpdate.project_id);
+    const newProjectIdStr = projectId === '' ? '' : String(projectId);
+    
+    if (currentProjectId === newProjectIdStr) {
+      console.log('Project already matches, skipping update');
+      return;
+    }
+
+    const newProjectId = projectId && projectId !== '' ? parseInt(projectId) : null;
+    
+    console.log('Updating note project:', {
+      noteId,
+      oldProjectId: noteToUpdate.project_id,
+      newProjectId,
+      projectIdParam: projectId
+    });
+
+    const updatedNote = { ...noteToUpdate, project_id: newProjectId };
+      setNotes(prevNotes => prevNotes.map(n => n.id === noteId ? updatedNote : n));
+    
+    if (currentNote?.id === noteId) {
+      setCurrentNote(updatedNote);
+    }
+
+    try {
+      const response = await updateNote(noteId, {
+        title: noteToUpdate.title,
+        content: noteToUpdate.content,
+        project_id: newProjectId
+      }, token);
+      console.log('Note project updated successfully:', response);
+    } catch (error) {
+      console.error('Failed to update project:', error);
+      setError('Failed to change project');
+      setNotes(prevNotes => prevNotes.map(n => n.id === noteId ? noteToUpdate : n));
+      if (currentNote?.id === noteId) {
+        setCurrentNote(noteToUpdate);
+      }
+    }
+  };
+
   const handleContentEditableChange = () => {
     if (contentEditableRef.current) {
       const newContent = contentEditableRef.current.innerHTML;
-      handleContentChange('content', newContent);
+      if (newContent !== currentNote?.content) {
+        handleContentChange('content', newContent);
+      }
     }
   };
 
@@ -82,12 +162,14 @@ export const NotesPage = ({ onNavigate }) => {
     try {
       const data = await createNoteAPI({
         title: 'Untitled Document',
-        content: ''
+        content: '',
+        project_id: selectedProject
       }, token);
       const newNote = { 
         id: data.id, 
         title: 'Untitled Document', 
-        content: '', 
+        content: '',
+        project_id: selectedProject,
         updated_at: new Date().toISOString() 
       };
       setNotes([newNote, ...notes]);
@@ -136,10 +218,15 @@ export const NotesPage = ({ onNavigate }) => {
     return date.toLocaleDateString();
   };
 
+  const getProjectName = (projectId) => {
+    const project = projects.find(p => p.id === projectId);
+    return project ? project.name : 'No Project';
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
-  // The headers and list not working at the moment 
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -163,6 +250,26 @@ export const NotesPage = ({ onNavigate }) => {
                   New Note
                 </button>
               </div>
+
+              {/* Project Filter */}
+              <div className="p-4 border-b border-gray-200">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Filter by Project
+                </label>
+                <select
+                  value={selectedProject || ''}
+                  onChange={(e) => setSelectedProject(e.target.value || null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="">All Projects</option>
+                  {projects.map(project => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="p-4 border-b border-gray-200">
                 <div className="relative">
                   <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -199,6 +306,26 @@ export const NotesPage = ({ onNavigate }) => {
                           <p className="text-sm text-gray-600 truncate mt-1">
                             {note.content ? note.content.replace(/<[^>]*>/g, '').substring(0, 60) : 'Empty note'}
                           </p>
+                          
+                          {/* Project Selector in List */}
+                          <div className="mt-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                            <select
+                              value={note.project_id || ''}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                handleNoteProjectChange(note.id, e.target.value);
+                              }}
+                              className="text-xs px-2 py-1 border border-gray-300 rounded bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            >
+                              <option value="">No Project</option>
+                              {projects.map(project => (
+                                <option key={project.id} value={project.id}>
+                                  {project.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          
                           <p className="text-xs text-gray-400 mt-2">
                             {formatDate(note.updated_at)}
                           </p>
@@ -234,7 +361,19 @@ export const NotesPage = ({ onNavigate }) => {
               )}
               {currentNote ? (
                 <>
-                  <div className="border-b border-gray-200 p-3 flex items-center justify-between bg-gray-50">
+                  {/* Title Input - Moved to top like Google Docs */}
+                  <div className="px-8 pt-6 pb-3">
+                    <input
+                      type="text"
+                      value={currentNote.title}
+                      onChange={(e) => handleContentChange('title', e.target.value)}
+                      className="w-full text-3xl font-semibold text-gray-900 focus:outline-none placeholder-gray-400 border-b border-transparent hover:border-gray-300 focus:border-blue-500 pb-2 transition-colors"
+                      placeholder="Untitled Document"
+                    />
+                  </div>
+
+                  {/* Toolbar */}
+                  <div className="border-b border-gray-200 px-8 py-2 flex items-center justify-between bg-gray-50">
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => applyFormatting('bold')}
@@ -309,22 +448,14 @@ export const NotesPage = ({ onNavigate }) => {
                       ) : null}
                     </div>
                   </div>
-                  <div className="p-8 pb-4 border-b border-gray-100">
-                    <input
-                      type="text"
-                      value={currentNote.title}
-                      onChange={(e) => handleContentChange('title', e.target.value)}
-                      className="w-full text-4xl font-bold text-gray-900 focus:outline-none placeholder-gray-400"
-                      placeholder="Untitled Document"
-                    />
-                  </div>
+
+                  {/* Content Editor */}
                   <div className="flex-1 overflow-y-auto px-8 py-6">
                     <div
                       ref={contentEditableRef}
                       contentEditable
                       suppressContentEditableWarning
                       onInput={handleContentEditableChange}
-                      onBlur={handleContentEditableChange}
                       className="min-h-full text-gray-800 focus:outline-none leading-relaxed prose prose-lg max-w-none"
                       style={{ 
                         fontSize: '16px',

@@ -32,6 +32,8 @@ class Project(db.Model):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive, nullable=False)
     owner: Mapped["User"] = relationship(back_populates="projects")
     tasks: Mapped[List["Task"]] = relationship(back_populates="project", cascade="all, delete-orphan", passive_deletes=True)
+    tasks: Mapped[List["Note"]] = relationship(back_populates="project", cascade="all, delete-orphan", passive_deletes=True)
+
 
 
 class Task(db.Model):
@@ -56,6 +58,8 @@ class Note(db.Model):
     title: Mapped[str] = mapped_column(String(255), nullable=False, default="Untitled Document")
     content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive, nullable=False)    
-    owner: Mapped["User"] = relationship(back_populates="notes")
+    owner: Mapped["User"] = relationship(back_populates="tasks")
+    project: Mapped["Project"] = relationship(back_populates="tasks")
