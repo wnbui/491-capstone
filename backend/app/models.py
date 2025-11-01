@@ -32,8 +32,7 @@ class Project(db.Model):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive, nullable=False)
     owner: Mapped["User"] = relationship(back_populates="projects")
     tasks: Mapped[List["Task"]] = relationship(back_populates="project", cascade="all, delete-orphan", passive_deletes=True)
-    tasks: Mapped[List["Note"]] = relationship(back_populates="project", cascade="all, delete-orphan", passive_deletes=True)
-
+    notes: Mapped[List["Note"]] = relationship(back_populates="project", cascade="all, delete-orphan", passive_deletes=True)
 
 
 class Task(db.Model):
@@ -60,6 +59,7 @@ class Note(db.Model):
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive, nullable=False)    
-    owner: Mapped["User"] = relationship(back_populates="tasks")
-    project: Mapped["Project"] = relationship(back_populates="tasks")
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive, nullable=False)
+    owner: Mapped["User"] = relationship(back_populates="notes")
+    project: Mapped["Project"] = relationship(back_populates="notes")
+
