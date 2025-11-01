@@ -130,7 +130,6 @@ export const NotesPage = ({ onNavigate }) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [projects, setProjects] = useState([]);
   const contentEditableRef = useRef(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -170,9 +169,7 @@ export const NotesPage = ({ onNavigate }) => {
     try {
       const data = await getNotes(token, selectedProject);
       setNotes(data || []);
-      if (data && data.length > 0 && !currentNote) {
-        setCurrentNote(data[0]);
-      } else if (!data || data.length === 0) {
+      if (!data || data.length === 0) {
         setCurrentNote(null);
       }
     } catch (error) {
@@ -344,6 +341,19 @@ export const NotesPage = ({ onNavigate }) => {
     return project ? project.name : 'No Project';
   };
 
+  const handleNoteClick = (note) => {
+    setCurrentNote(note);
+  };
+
+  const handleCloseEditor = () => {
+    setCurrentNote(null);
+  };
+
+  const handleProjectFilterChange = (value) => {
+    setSelectedProject(value || null);
+    setCurrentNote(null);
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -354,47 +364,51 @@ export const NotesPage = ({ onNavigate }) => {
       <div className="flex">
         <Sidebar activePage="notes" onNavigate={onNavigate} />
         <main className="flex-1 flex flex-col" style={{ height: 'calc(100vh - 64px)' }}>
+          {/* Header with Title and New Note Button */}
           <div className="bg-white border-b border-gray-200 px-8 py-4">
-            <h2 className="text-2xl font-bold text-blue-700 flex items-center space-x-2">
-              <BookOpen size={28} />
-              <span>Notes</span>
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-blue-700 flex items-center space-x-2">
+                <BookOpen size={28} />
+                <span>Notes</span>
+              </h2>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors font-medium shadow-sm"
+              >
+                <Plus size={20} />
+                New Note
+              </button>
+            </div>
           </div>
-          <div className="flex flex-1 overflow-hidden">
+
+          <div className="flex flex-1 overflow-hidden bg-white">
+            {/* Notes List Section */}
             <div 
-              className={`bg-white border-r border-gray-200 flex flex-col shadow-sm transition-all duration-300 ${
-                isSidebarCollapsed ? 'w-12' : 'w-80'
+              className={`border-r border-gray-200 flex flex-col shadow-sm transition-all duration-300 ${
+                isSidebarCollapsed ? 'w-12' : currentNote ? 'w-80' : 'w-full max-w-4xl'
               }`}
             >
-              <div className="p-2 border-b border-gray-200 flex justify-end">
-                <button
-                  onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                  className="p-2 rounded hover:bg-gray-100 transition-colors text-gray-600"
-                  title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                >
-                  {isSidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-                </button>
-              </div>
+              {currentNote && (
+                <div className="p-2 border-b border-gray-200 flex justify-end">
+                  <button
+                    onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                    className="p-2 rounded hover:bg-gray-100 transition-colors text-gray-600"
+                    title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                  >
+                    {isSidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+                  </button>
+                </div>
+              )}
 
               {!isSidebarCollapsed && (
                 <>
-                  <div className="p-4 border-b border-gray-200">
-                    <button
-                      onClick={() => setIsModalOpen(true)}
-                      className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors font-medium shadow-sm"
-                    >
-                      <Plus size={20} />
-                      New Note
-                    </button>
-                  </div>
-
                   <div className="p-4 border-b border-gray-200">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Filter by Project
                     </label>
                     <select
                       value={selectedProject || ''}
-                      onChange={(e) => setSelectedProject(e.target.value || null)}
+                      onChange={(e) => handleProjectFilterChange(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                     >
                       <option value="">All Projects</option>
@@ -418,7 +432,7 @@ export const NotesPage = ({ onNavigate }) => {
                       />
                     </div>
                   </div>
-                  <div className="flex-1 overflow-y-auto">
+                  <div className="flex-1 overflow-y-auto bg-white">
                     {filteredNotes.length === 0 ? (
                       <div className="p-8 text-center text-gray-500">
                         <FileText size={48} className="mx-auto mb-4 text-gray-300" />
@@ -428,75 +442,82 @@ export const NotesPage = ({ onNavigate }) => {
                         </p>
                       </div>
                     ) : (
-                      filteredNotes.map(note => (
-                        <div
-                          key={note.id}
-                          onClick={() => setCurrentNote(note)}
-                          className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
-                            currentNote?.id === note.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-gray-900 truncate">
-                                {note.title || 'Untitled Document'}
-                              </h3>
-                              <p className="text-sm text-gray-600 truncate mt-1">
-                                {note.content ? note.content.replace(/<[^>]*>/g, '').substring(0, 60) : 'Empty note'}
-                              </p>
-                              
-                              <div className="mt-2">
-                                <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
-                                  {getProjectName(note.project_id)}
-                                </span>
+                      <div className={currentNote ? '' : 'p-6 space-y-3 max-w-4xl'}>
+                        {filteredNotes.map(note => (
+                          <div
+                            key={note.id}
+                            onClick={() => handleNoteClick(note)}
+                            className={`cursor-pointer hover:bg-gray-50 transition-colors ${
+                              currentNote 
+                                ? `p-4 border-b border-gray-200 ${currentNote?.id === note.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''}`
+                                : 'p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <h3 className={`font-semibold text-gray-900 ${currentNote ? 'truncate' : 'mb-2'}`}>
+                                  {note.title || 'Untitled Document'}
+                                </h3>
+                                <p className={`text-sm text-gray-600 mt-1 ${currentNote ? 'truncate' : 'line-clamp-2'}`}>
+                                  {note.content ? note.content.replace(/<[^>]*>/g, '').substring(0, currentNote ? 60 : 150) : 'Empty note'}
+                                </p>
+                                
+                                <div className="mt-2 flex items-center gap-2">
+                                  <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                                    {getProjectName(note.project_id)}
+                                  </span>
+                                  <span className="text-xs text-gray-400">
+                                    {formatDate(note.updated_at)}
+                                  </span>
+                                </div>
                               </div>
-                              
-                              <p className="text-xs text-gray-400 mt-2">
-                                {formatDate(note.updated_at)}
-                              </p>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteNote(note.id);
+                                }}
+                                className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                                title="Delete note"
+                              >
+                                <Trash2 size={16} />
+                              </button>
                             </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteNote(note.id);
-                              }}
-                              className="text-gray-400 hover:text-red-600 transition-colors p-1"
-                              title="Delete note"
-                            >
-                              <Trash2 size={16} />
-                            </button>
                           </div>
-                        </div>
-                      ))
+                        ))}
+                      </div>
                     )}
                   </div>
                 </>
               )}
             </div>
-            <div className="flex-1 flex flex-col bg-white overflow-hidden">
-              {error && (
-                <div className="bg-red-50 border-b border-red-200 p-3 flex items-center gap-2 text-red-700">
-                  <AlertCircle size={18} />
-                  <span className="text-sm">{error}</span>
-                  <button 
-                    onClick={() => setError(null)}
-                    className="ml-auto text-red-700 hover:text-red-900"
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-              {currentNote ? (
-                <>
-                  <div className="px-8 pt-6 pb-3 border-b border-gray-200">
-                    <div className="flex items-start gap-4">
-                      <input
-                        type="text"
-                        value={currentNote.title}
-                        onChange={(e) => handleContentChange('title', e.target.value)}
-                        className="flex-1 text-2xl font-semibold text-gray-900 focus:outline-none placeholder-gray-400 border-b border-transparent hover:border-gray-300 focus:border-blue-500 pb-2 transition-colors"
-                        placeholder="Untitled Document"
-                      />
+
+            {/* Editor Section */}
+            {currentNote && (
+              <div className="flex-1 flex flex-col bg-white overflow-hidden">
+                {error && (
+                  <div className="bg-red-50 border-b border-red-200 p-3 flex items-center gap-2 text-red-700">
+                    <AlertCircle size={18} />
+                    <span className="text-sm">{error}</span>
+                    <button 
+                      onClick={() => setError(null)}
+                      className="ml-auto text-red-700 hover:text-red-900"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+                
+                {/* Title and Project Section */}
+                <div className="px-8 pt-6 pb-3 border-b border-gray-200">
+                  <div className="flex items-start gap-4">
+                    <input
+                      type="text"
+                      value={currentNote.title}
+                      onChange={(e) => handleContentChange('title', e.target.value)}
+                      className="flex-1 text-2xl font-semibold text-gray-900 focus:outline-none placeholder-gray-400 border-b border-transparent hover:border-gray-300 focus:border-blue-500 pb-2 transition-colors"
+                      placeholder="Untitled Document"
+                    />
+                    <div className="flex items-center gap-2">
                       <div className="flex flex-col gap-1 min-w-[200px]">
                         <label className="text-xs font-medium text-gray-600">
                           Project
@@ -514,118 +535,110 @@ export const NotesPage = ({ onNavigate }) => {
                           ))}
                         </select>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="border-b border-gray-200 px-8 py-2 flex items-center justify-between bg-gray-50">
-                    <div className="flex items-center gap-1">
                       <button
-                        onClick={() => applyFormatting('bold')}
-                        className="p-2 rounded hover:bg-gray-200 transition-colors"
-                        title="Bold (Ctrl+B)"
+                        onClick={handleCloseEditor}
+                        className="p-2 rounded hover:bg-gray-100 transition-colors text-gray-600 mt-5"
+                        title="Close editor"
                       >
-                        <Bold size={18} />
-                      </button>
-                      <button
-                        onClick={() => applyFormatting('italic')}
-                        className="p-2 rounded hover:bg-gray-200 transition-colors"
-                        title="Italic (Ctrl+I)"
-                      >
-                        <Italic size={18} />
-                      </button>
-                      <button
-                        onClick={() => applyFormatting('underline')}
-                        className="p-2 rounded hover:bg-gray-200 transition-colors"
-                        title="Underline (Ctrl+U)"
-                      >
-                        <Underline size={18} />
-                      </button>
-                      <div className="w-px h-6 bg-gray-300 mx-2"></div>
-                      <button
-                        onClick={() => applyFormatting('formatBlock', 'h1')}
-                        className="px-3 py-2 rounded hover:bg-gray-200 text-lg font-bold transition-colors"
-                        title="Heading 1"
-                      >
-                        H1
-                      </button>
-                      <button
-                        onClick={() => applyFormatting('formatBlock', 'h2')}
-                        className="px-3 py-2 rounded hover:bg-gray-200 text-base font-bold transition-colors"
-                        title="Heading 2"
-                      >
-                        H2
-                      </button>
-                      <button
-                        onClick={() => applyFormatting('formatBlock', 'h3')}
-                        className="px-3 py-2 rounded hover:bg-gray-200 text-sm font-bold transition-colors"
-                        title="Heading 3"
-                      >
-                        H3
-                      </button>
-                      <div className="w-px h-6 bg-gray-300 mx-2"></div>
-                      <button
-                        onClick={() => applyFormatting('insertUnorderedList')}
-                        className="p-2 rounded hover:bg-gray-200 transition-colors"
-                        title="Bullet List"
-                      >
-                        <List size={18} />
-                      </button>
-                      <button
-                        onClick={() => applyFormatting('insertOrderedList')}
-                        className="p-2 rounded hover:bg-gray-200 transition-colors"
-                        title="Numbered List"
-                      >
-                        <ListOrdered size={18} />
+                        <X size={20} />
                       </button>
                     </div>
-                    <div className="flex items-center gap-3">
-                      {isSaving ? (
-                        <span className="text-sm text-gray-500 flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
-                          Saving...
-                        </span>
-                      ) : lastSaved ? (
-                        <span className="text-sm text-gray-500 flex items-center gap-1">
-                          <Check size={14} className="text-green-600" />
-                          Saved at {new Date(lastSaved).toLocaleTimeString()}
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto px-8 py-6">
-                    <div
-                      ref={contentEditableRef}
-                      contentEditable
-                      suppressContentEditableWarning
-                      onInput={handleContentEditableChange}
-                      className="min-h-full text-gray-800 focus:outline-none leading-relaxed prose prose-lg max-w-none"
-                      style={{ 
-                        fontSize: '16px',
-                        lineHeight: '1.8'
-                      }}
-                    />
-                  </div>
-                </>
-              ) : (
-                <div className="flex-1 flex items-center justify-center text-gray-400">
-                  <div className="text-center">
-                    <FileText size={64} className="mx-auto mb-4 text-gray-300" />
-                    <p className="text-xl font-medium text-gray-500">
-                      Select a note or create a new one
-                    </p>
-                    {notes.length === 0 && (
-                      <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                      >
-                        Create Your First Note
-                      </button>
-                    )}
                   </div>
                 </div>
-              )}
-            </div>
+
+                {/* Toolbar */}
+                <div className="border-b border-gray-200 px-8 py-2 flex items-center justify-between bg-gray-50">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => applyFormatting('bold')}
+                      className="p-2 rounded hover:bg-gray-200 transition-colors"
+                      title="Bold (Ctrl+B)"
+                    >
+                      <Bold size={18} />
+                    </button>
+                    <button
+                      onClick={() => applyFormatting('italic')}
+                      className="p-2 rounded hover:bg-gray-200 transition-colors"
+                      title="Italic (Ctrl+I)"
+                    >
+                      <Italic size={18} />
+                    </button>
+                    <button
+                      onClick={() => applyFormatting('underline')}
+                      className="p-2 rounded hover:bg-gray-200 transition-colors"
+                      title="Underline (Ctrl+U)"
+                    >
+                      <Underline size={18} />
+                    </button>
+                    <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                    <button
+                      onClick={() => applyFormatting('formatBlock', 'h1')}
+                      className="px-3 py-2 rounded hover:bg-gray-200 text-lg font-bold transition-colors"
+                      title="Heading 1"
+                    >
+                      H1
+                    </button>
+                    <button
+                      onClick={() => applyFormatting('formatBlock', 'h2')}
+                      className="px-3 py-2 rounded hover:bg-gray-200 text-base font-bold transition-colors"
+                      title="Heading 2"
+                    >
+                      H2
+                    </button>
+                    <button
+                      onClick={() => applyFormatting('formatBlock', 'h3')}
+                      className="px-3 py-2 rounded hover:bg-gray-200 text-sm font-bold transition-colors"
+                      title="Heading 3"
+                    >
+                      H3
+                    </button>
+                    <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                    <button
+                      onClick={() => applyFormatting('insertUnorderedList')}
+                      className="p-2 rounded hover:bg-gray-200 transition-colors"
+                      title="Bullet List"
+                    >
+                      <List size={18} />
+                    </button>
+                    <button
+                      onClick={() => applyFormatting('insertOrderedList')}
+                      className="p-2 rounded hover:bg-gray-200 transition-colors"
+                      title="Numbered List"
+                    >
+                      <ListOrdered size={18} />
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {isSaving ? (
+                      <span className="text-sm text-gray-500 flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
+                        Saving...
+                      </span>
+                    ) : lastSaved ? (
+                      <span className="text-sm text-gray-500 flex items-center gap-1">
+                        <Check size={14} className="text-green-600" />
+                        Saved at {new Date(lastSaved).toLocaleTimeString()}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+
+                {/* Content Editor */}
+                <div className="flex-1 overflow-y-auto px-8 py-6">
+                  <div
+                    ref={contentEditableRef}
+                    contentEditable
+                    suppressContentEditableWarning
+                    onInput={handleContentEditableChange}
+                    className="min-h-full text-gray-800 focus:outline-none leading-relaxed prose prose-lg max-w-none"
+                    style={{ 
+                      fontSize: '16px',
+                      lineHeight: '1.8'
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>
