@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { getNotes, createNote as createNoteAPI, updateNote, deleteNote as deleteNoteAPI, getProjects } from '../services/api';
 import { FileText, Trash2, Plus, Search, Check, AlertCircle, Bold, Italic, Underline, List, ListOrdered, BookOpen } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useSocket } from '../hooks/useSocket';
 import { Header } from '../components/layout/Header';
 import { Sidebar } from '../components/layout/Sidebar';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
@@ -29,6 +30,7 @@ export const NotesPage = ({ onNavigate }) => {
   }, []);
 
   useEffect(() => {
+    // Only reload notes when project filter changes (not on initial load)
     if (projects.length > 0) {
       loadNotes();
     }
@@ -110,6 +112,7 @@ export const NotesPage = ({ onNavigate }) => {
     const currentProjectId = noteToUpdate.project_id === null ? '' : String(noteToUpdate.project_id);
     const newProjectIdStr = projectId === '' ? '' : String(projectId);
     
+    // Don't update if the project is already the same
     if (currentProjectId === newProjectIdStr) {
       console.log('Project already matches, skipping update');
       return;
@@ -125,12 +128,15 @@ export const NotesPage = ({ onNavigate }) => {
     });
 
     const updatedNote = { ...noteToUpdate, project_id: newProjectId };
-      setNotes(prevNotes => prevNotes.map(n => n.id === noteId ? updatedNote : n));
+    
+    // Update local state immediately
+    setNotes(prevNotes => prevNotes.map(n => n.id === noteId ? updatedNote : n));
     
     if (currentNote?.id === noteId) {
       setCurrentNote(updatedNote);
     }
 
+    // Send to API
     try {
       const response = await updateNote(noteId, {
         title: noteToUpdate.title,
@@ -141,6 +147,7 @@ export const NotesPage = ({ onNavigate }) => {
     } catch (error) {
       console.error('Failed to update project:', error);
       setError('Failed to change project');
+      // Revert on error
       setNotes(prevNotes => prevNotes.map(n => n.id === noteId ? noteToUpdate : n));
       if (currentNote?.id === noteId) {
         setCurrentNote(noteToUpdate);
@@ -151,6 +158,7 @@ export const NotesPage = ({ onNavigate }) => {
   const handleContentEditableChange = () => {
     if (contentEditableRef.current) {
       const newContent = contentEditableRef.current.innerHTML;
+      // Only update if content actually changed
       if (newContent !== currentNote?.content) {
         handleContentChange('content', newContent);
       }

@@ -4,9 +4,12 @@ from flask import Flask, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
+from flask_socketio import SocketIO
+
 
 db = SQLAlchemy()
 migrate = Migrate()
+socketio = SocketIO( cors_allowed_origins="*")
 
 def create_app():
     app = Flask(__name__)
@@ -14,6 +17,7 @@ def create_app():
 
     db.init_app(app)
     migrate.init_app(app, db)
+    socketio.init_app(app)
 
     # Register routes
     from .routes.auth import auth_bp
