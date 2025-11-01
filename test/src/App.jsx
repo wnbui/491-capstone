@@ -27,10 +27,26 @@ function App() {
       
       case 'main':
         return <DashboardPage onNavigate={navigate} />;
+
+      case 'project':
+        return currentProjectId ? (
+          <ProjectDetailPage projectId={currentProjectId} onNavigate={navigate} />
+        ) : (
+          <DashboardPage onNavigate={navigate} />
+        );
+      
+      case 'tasks':
+        return <TasksPage onNavigate={navigate} />;
       
       case 'notes':
         return <NotesPage onNavigate={navigate} />;
       
+      case 'files':
+        return <FilesPage onNavigate={navigate} />;
+      
+      case 'settings':
+        return <SettingsPage onNavigate={navigate} />;
+
       default:
         return <LoginPage onNavigate={navigate} />;
     }
