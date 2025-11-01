@@ -1,9 +1,121 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getNotes, createNote as createNoteAPI, updateNote, deleteNote as deleteNoteAPI, getProjects } from '../services/api';
-import { FileText, Trash2, Plus, Search, Check, AlertCircle, Bold, Italic, Underline, List, ListOrdered, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';import { useAuth } from '../hooks/useAuth';
+import { FileText, Trash2, Plus, Search, Check, AlertCircle, Bold, Italic, Underline, List, ListOrdered, BookOpen, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 import { Header } from '../components/layout/Header';
 import { Sidebar } from '../components/layout/Sidebar';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+
+// New Note Modal Component
+const NewNoteModal = ({ isOpen, onClose, onCreateNote, projects }) => {
+  const [title, setTitle] = useState('');
+  const [selectedProject, setSelectedProject] = useState('');
+
+  const handleSubmit = () => {
+    if (!title.trim()) {
+      alert('Please enter a note title');
+      return;
+    }
+    if (!selectedProject) {
+      alert('Please select a project');
+      return;
+    }
+    
+    onCreateNote({
+      title: title.trim(),
+      project_id: parseInt(selectedProject)
+    });
+    
+    // Reset form
+    setTitle('');
+    setSelectedProject('');
+  };
+
+  const handleCancel = () => {
+    setTitle('');
+    setSelectedProject('');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Create New Note</h2>
+          <button
+            onClick={handleCancel}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="p-6">
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="note-title" className="block text-sm font-medium text-gray-700 mb-2">
+                Note Title *
+              </label>
+              <input
+                id="note-title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
+                placeholder="Enter note title..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                autoFocus
+              />
+            </div>
+
+            <div>
+              <label htmlFor="note-project" className="block text-sm font-medium text-gray-700 mb-2">
+                Project *
+              </label>
+              <select
+                id="note-project"
+                value={selectedProject}
+                onChange={(e) => setSelectedProject(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select a project...</option>
+                {projects.map(project => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 mt-6">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Create Note
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const NotesPage = ({ onNavigate }) => {
   const { token } = useAuth();
@@ -20,6 +132,7 @@ export const NotesPage = ({ onNavigate }) => {
   const contentEditableRef = useRef(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -125,7 +238,7 @@ export const NotesPage = ({ onNavigate }) => {
     });
 
     const updatedNote = { ...noteToUpdate, project_id: newProjectId };
-      setNotes(prevNotes => prevNotes.map(n => n.id === noteId ? updatedNote : n));
+    setNotes(prevNotes => prevNotes.map(n => n.id === noteId ? updatedNote : n));
     
     if (currentNote?.id === noteId) {
       setCurrentNote(updatedNote);
@@ -157,23 +270,24 @@ export const NotesPage = ({ onNavigate }) => {
     }
   };
 
-  const createNote = async () => {
+  const createNote = async (noteData) => {
     setError(null);
     try {
       const data = await createNoteAPI({
-        title: 'Untitled Document',
+        title: noteData.title,
         content: '',
-        project_id: selectedProject
+        project_id: noteData.project_id
       }, token);
       const newNote = { 
         id: data.id, 
-        title: 'Untitled Document', 
+        title: noteData.title, 
         content: '',
-        project_id: selectedProject,
+        project_id: noteData.project_id,
         updated_at: new Date().toISOString() 
       };
       setNotes([newNote, ...notes]);
       setCurrentNote(newNote);
+      setIsModalOpen(false);
     } catch (error) {
       console.error('Failed to create note:', error);
       setError('Failed to create new note');
@@ -213,6 +327,7 @@ export const NotesPage = ({ onNavigate }) => {
       return matchesSearch && note.project_id === selectedProjectId;
     }
   });
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -246,13 +361,11 @@ export const NotesPage = ({ onNavigate }) => {
             </h2>
           </div>
           <div className="flex flex-1 overflow-hidden">
-            {/* Collapsible Sidebar */}
             <div 
               className={`bg-white border-r border-gray-200 flex flex-col shadow-sm transition-all duration-300 ${
                 isSidebarCollapsed ? 'w-12' : 'w-80'
               }`}
             >
-              {/* Toggle Button */}
               <div className="p-2 border-b border-gray-200 flex justify-end">
                 <button
                   onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -267,7 +380,7 @@ export const NotesPage = ({ onNavigate }) => {
                 <>
                   <div className="p-4 border-b border-gray-200">
                     <button
-                      onClick={createNote}
+                      onClick={() => setIsModalOpen(true)}
                       className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors font-medium shadow-sm"
                     >
                       <Plus size={20} />
@@ -275,7 +388,6 @@ export const NotesPage = ({ onNavigate }) => {
                     </button>
                   </div>
 
-                  {/* Project Filter */}
                   <div className="p-4 border-b border-gray-200">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Filter by Project
@@ -333,23 +445,10 @@ export const NotesPage = ({ onNavigate }) => {
                                 {note.content ? note.content.replace(/<[^>]*>/g, '').substring(0, 60) : 'Empty note'}
                               </p>
                               
-                              {/* Project Selector in List */}
-                              <div className="mt-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                <select
-                                  value={note.project_id || ''}
-                                  onChange={(e) => {
-                                    e.stopPropagation();
-                                    handleNoteProjectChange(note.id, e.target.value);
-                                  }}
-                                  className="text-xs px-2 py-1 border border-gray-300 rounded bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                >
-                                  <option value="">No Project</option>
-                                  {projects.map(project => (
-                                    <option key={project.id} value={project.id}>
-                                      {project.name}
-                                    </option>
-                                  ))}
-                                </select>
+                              <div className="mt-2">
+                                <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                                  {getProjectName(note.project_id)}
+                                </span>
                               </div>
                               
                               <p className="text-xs text-gray-400 mt-2">
@@ -389,18 +488,35 @@ export const NotesPage = ({ onNavigate }) => {
               )}
               {currentNote ? (
                 <>
-                  {/* Title Input - Moved to top like Google Docs */}
-                  <div className="px-8 pt-6 pb-3">
-                    <input
-                      type="text"
-                      value={currentNote.title}
-                      onChange={(e) => handleContentChange('title', e.target.value)}
-                      className="w-full text-3xl font-semibold text-gray-900 focus:outline-none placeholder-gray-400 border-b border-transparent hover:border-gray-300 focus:border-blue-500 pb-2 transition-colors"
-                      placeholder="Untitled Document"
-                    />
+                  <div className="px-8 pt-6 pb-3 border-b border-gray-200">
+                    <div className="flex items-start gap-4">
+                      <input
+                        type="text"
+                        value={currentNote.title}
+                        onChange={(e) => handleContentChange('title', e.target.value)}
+                        className="flex-1 text-2xl font-semibold text-gray-900 focus:outline-none placeholder-gray-400 border-b border-transparent hover:border-gray-300 focus:border-blue-500 pb-2 transition-colors"
+                        placeholder="Untitled Document"
+                      />
+                      <div className="flex flex-col gap-1 min-w-[200px]">
+                        <label className="text-xs font-medium text-gray-600">
+                          Project
+                        </label>
+                        <select
+                          value={currentNote.project_id || ''}
+                          onChange={(e) => handleNoteProjectChange(currentNote.id, e.target.value)}
+                          className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="">No Project</option>
+                          {projects.map(project => (
+                            <option key={project.id} value={project.id}>
+                              {project.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Toolbar */}
                   <div className="border-b border-gray-200 px-8 py-2 flex items-center justify-between bg-gray-50">
                     <div className="flex items-center gap-1">
                       <button
@@ -477,7 +593,6 @@ export const NotesPage = ({ onNavigate }) => {
                     </div>
                   </div>
 
-                  {/* Content Editor */}
                   <div className="flex-1 overflow-y-auto px-8 py-6">
                     <div
                       ref={contentEditableRef}
@@ -501,7 +616,7 @@ export const NotesPage = ({ onNavigate }) => {
                     </p>
                     {notes.length === 0 && (
                       <button
-                        onClick={createNote}
+                        onClick={() => setIsModalOpen(true)}
                         className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                       >
                         Create Your First Note
@@ -514,6 +629,13 @@ export const NotesPage = ({ onNavigate }) => {
           </div>
         </main>
       </div>
+      
+      <NewNoteModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onCreateNote={createNote}
+        projects={projects}
+      />
     </div>
   );
 };
