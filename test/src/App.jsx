@@ -4,12 +4,14 @@ import { AuthGuard } from './components/layout/AuthGuard';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { PlannerPage } from './pages/PlannerPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('login');
   const [currentProjectId, setCurrentProjectId] = useState(null);
 
   const navigate = (page, projectId = null) => {
+    console.log("[NAVIGATE] called ->", page, "projectId:", projectId, "currentPage before:", currentPage);
     setCurrentPage(page);
     if (projectId) {
       setCurrentProjectId(projectId);
@@ -36,6 +38,9 @@ function App() {
       
       case 'tasks':
         return <TasksPage onNavigate={navigate} />;
+
+      case 'planner':
+        return <PlannerPage onNavigate={navigate} />;
       
       case 'notes':
         return <NotesPage onNavigate={navigate} />;

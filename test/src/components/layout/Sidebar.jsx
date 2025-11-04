@@ -1,9 +1,10 @@
-import { ListTodo, FileText, Upload, Settings, FolderKanban } from 'lucide-react';
+import { ListTodo, FileText, Upload, Settings, FolderKanban, Calendar } from 'lucide-react';
 
 export const Sidebar = ({ activePage, onNavigate }) => {
   const menuItems = [
-    { id: 'projects', label: 'Projects', icon: FolderKanban, page: 'main'}, 
+    { id: 'projects', label: 'Projects', icon: FolderKanban, page: 'main' }, 
     { id: 'tasks', label: 'Tasks', icon: ListTodo, page: 'tasks' },
+    { id: 'planner', label: 'Planner', icon: Calendar, page: 'planner' },
     { id: 'notes', label: 'Notes', icon: FileText, page: 'notes' },
     { id: 'files', label: 'Upload Files', icon: Upload, page: 'files' },
     { id: 'settings', label: 'Settings', icon: Settings, page: 'settings' }

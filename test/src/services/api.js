@@ -130,4 +130,40 @@ export const deleteTask = async (taskId, token) => {
   return response.data;
 };
 
+// Event APIs
+export const getEvents = async(token) => {
+  const response = await api.get('/events', {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
+export const getEvent = async(eventId, token) => {
+  const response = await api.patch(`/events/${eventId}`, {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
+export const createEvent = async (eventData, token) => {
+  const response = await api.post('/events', eventData, {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
+export const updateEvent = async (eventId, eventData, token) => {
+  const response = await api.patch(`/events/${eventId}`, eventData, {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
+export const deleteEvent = async (eventId, token) => {
+  const response = await api.delete(`/events/${eventId}`, {
+    headers: getAuthHeader(token),
+  });
+  return response.data;
+};
+
 export default api;

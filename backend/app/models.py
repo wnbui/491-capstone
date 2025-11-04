@@ -18,6 +18,7 @@ class User(db.Model):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, nullable=False)
     projects: Mapped[List["Project"]] = relationship(back_populates="owner", cascade="all, delete-orphan", passive_deletes=True)
     tasks: Mapped[List["Task"]] = relationship(back_populates="owner", cascade="all, delete-orphan", passive_deletes=True)
+    events: Mapped[List["Event"]] = relationship("Event", back_populates="owner", cascade="all, delete-orphan", passive_deletes=True)
 
 class Project(db.Model):
     __tablename__ = "projects"
@@ -47,3 +48,15 @@ class Task(db.Model):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive, nullable=False)
     owner: Mapped["User"] = relationship(back_populates="tasks")
     project: Mapped["Project"] = relationship(back_populates="tasks")
+
+class Event(db.Model):
+    __tablename__ = "events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    start: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    end: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    creation_time: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, nullable=False)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    owner: Mapped["User"] = relationship("User", back_populates="events")
