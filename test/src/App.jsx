@@ -4,7 +4,11 @@ import { AuthGuard } from './components/layout/AuthGuard';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { NotesPage } from './pages/NotesPage'; 
+import { ProjectDetailPage } from './pages/ProjectDetailPage';
+import { TasksPage } from './pages/TasksPage';
+import { NotesPage } from './pages/NotesPage';
+import { FilesPage } from './pages/FilesPage';
+import { SettingsPage } from './pages/SettingsPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('login');
