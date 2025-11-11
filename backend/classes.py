@@ -469,4 +469,33 @@ class Settings(declarative_base()):
         self.task_creation_notif = task_creation_notif
         self.deadline_notif = deadline_notif
 
-# Working on the Notes addition 
+class Note(declarative_base()):
+    __tablename__ = 'notes'
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String(200), nullable=False)
+    content = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.now())
+    updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    project_id = Column(Integer, ForeignKey('projects.id'), nullable=True)
+    creator_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+
+    project = relationship("Project", backref="notes")
+    creator = relationship("User", backref="notes")
+
+    def __init__(self, title, content, project_id, creator_id):
+        self.title = title
+        self.content = content
+        self.project_id = project_id
+        self.creator_id = creator_id
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'content': self.content,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'project_id': self.project_id,
+            'creator_id': self.creator_id
+        }
