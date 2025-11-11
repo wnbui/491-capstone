@@ -81,6 +81,28 @@ class TaskOut(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+class EventCreateIn(BaseModel):
+    name: str
+    description: Optional[str] = None
+    start: datetime
+    end: datetime
+
+class EventUpdateIn(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=128)
+    description: Optional[str] = None
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+
+class EventOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str
+    description: Optional[str]
+    start: datetime
+    end: datetime
+    owner_id: int
+    creation_time: datetime
+
 class NoteCreateIn(BaseModel):
     title: str = Field(default="Untitled Document")
     content: Optional[str] = Field(default="")
