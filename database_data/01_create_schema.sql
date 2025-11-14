@@ -3,6 +3,7 @@
 
 -- Create database
 CREATE DATABASE IF NOT EXISTS project_mgmt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 USE project_mgmt;
 
 -- Users table
@@ -16,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at DATETIME NOT NULL,
     INDEX idx_username (username),
     INDEX idx_email (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- Projects table
 CREATE TABLE IF NOT EXISTS projects (
@@ -29,8 +30,8 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at DATETIME NOT NULL,
     INDEX idx_name (name),
     INDEX idx_owner_id (owner_id),
-    FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- Tasks table
 CREATE TABLE IF NOT EXISTS tasks (
@@ -46,6 +47,35 @@ CREATE TABLE IF NOT EXISTS tasks (
     INDEX idx_title (title),
     INDEX idx_owner_id (owner_id),
     INDEX idx_project_id (project_id),
-    FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- Events table
+CREATE TABLE IF NOT EXISTS events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(128) NOT NULL,
+    description TEXT,
+    start DATETIME NOT NULL,
+    end DATETIME NOT NULL,
+    creation_time DATETIME NOT NULL,
+    owner_id INT NOT NULL,
+    INDEX idx_events_name (name),
+    INDEX idx_events_owner_id (owner_id),
+    FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- Notes table
+CREATE TABLE IF NOT EXISTS notes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    owner_id INT NOT NULL,
+    project_id INT NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    INDEX idx_notes_owner_id (owner_id),
+    INDEX idx_notes_project_id (project_id),
+    FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

@@ -102,3 +102,27 @@ class EventOut(BaseModel):
     end: datetime
     owner_id: int
     creation_time: datetime
+
+class NoteCreateIn(BaseModel):
+    title: str = Field(default="Untitled Document")
+    content: Optional[str] = Field(default="")
+    project_id: int;
+
+class NoteUpdateIn(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    project_id: int;
+
+
+class NoteOut(BaseModel):
+    id: int
+    title: str
+    content: Optional[str]
+    owner_id: int
+    project_id: int;
+
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
