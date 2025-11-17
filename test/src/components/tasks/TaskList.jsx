@@ -25,10 +25,6 @@ export const TaskList = ({ tasks, title = 'Recent Tasks' }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
-        <ListTodo size={28} />
-        <span>{title}</span>
-      </h2>
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="divide-y divide-gray-200">
           {tasks.map((task) => (

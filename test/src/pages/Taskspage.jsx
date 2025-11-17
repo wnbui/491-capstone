@@ -6,6 +6,7 @@ import { TaskList } from '../components/tasks/TaskList';
 import { TaskDetailModal } from '../components/tasks/TaskDetailModal';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Sidebar } from '../components/layout/Sidebar';
+import { ListTodo } from 'lucide-react';
 
 export const TasksPage = ({ onNavigate }) => {
   const { token } = useAuth();
@@ -54,15 +55,18 @@ export const TasksPage = ({ onNavigate }) => {
         <main className="flex-1 p-8">
           <div className="max-w-7xl mx-auto">
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">All Tasks</h1>
-              <div className="flex space-x-2">
+              <h2 className="text-2xl font-bold text-grey-900 flex items-center space-x-2">
+                <ListTodo size={28} />
+                <span>All Tasks</span>
+              </h2>
+              <div className="flex space-x-2 mt-2">
                 {['all', 'todo', 'in_progress', 'in_review', 'done'].map((status) => (
                   <button
                     key={status}
                     onClick={() => setFilter(status)}
                     className={`px-4 py-2 rounded-lg font-medium transition ${
                       filter === status
-                        ? 'bg-indigo-600 text-white'
+                        ? 'bg-blue-600 text-white'
                         : 'bg-white text-gray-700 hover:bg-gray-100'
                     }`}
                   >
