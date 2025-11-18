@@ -24,6 +24,10 @@ This is the mono repository for our 491 Capstone project. The file structure is 
 - **JWT** - Secure authentication
 - **Pydantic** - Data validation
 
+### DevOps & Testing
+- **GitHub Actions** - CI/CD workflow to test commits, PR, and merges
+- **Cypress** - Light weight end-to-end testing for JaveScript based web apps
+
 ## Setup Requirements
 - Node.js 18+
 - Python 3.8+
@@ -100,7 +104,11 @@ Frontend will run on: **http://localhost:5173**
 3. **Login**: Sign in with your credentials
 4. **Create Project**: Click "New Project" button
 5. **Add Tasks**: Open a project and click "New Task"
-6. **Manage**: Drag tasks, update statuses, and track progress!
+6. **Manage**: Drag tasks, update statuses, track progress, and delete tasks
+7. **Create Events**: Navigate to the Planner to access a calendar to create events
+8. **Notes**: Navigate to the Notes page to create notes for each project
+9. **Settings**: Navigate to the Settings page to update user password and email addrees
+
 
 ## Log in as an existing user from the existing database
 All users have the same test password (**Password123!**). Log in using any of the 10 existing users from the database.
