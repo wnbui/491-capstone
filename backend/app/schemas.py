@@ -22,6 +22,17 @@ class UserOut(BaseModel):
     role: str
     created_at: datetime
 
+class UserUpdateIn(BaseModel):
+    full_name: Optional[str] = Field(default=None, min_length=3, max_length=128)
+    email: Optional[EmailStr] = None
+
+class PasswordChangeIn(BaseModel):
+    current_password: str = Field(min_length=8)
+    new_password: str = Field(min_length=8)
+
+class UserPreferencesIn(BaseModel):
+    auto_save_interval: Optional[int] = Field(default=2, ge=1, le=10)
+
 class LoginOut(BaseModel):
     message: str
     token: str
@@ -106,12 +117,12 @@ class EventOut(BaseModel):
 class NoteCreateIn(BaseModel):
     title: str = Field(default="Untitled Document")
     content: Optional[str] = Field(default="")
-    project_id: int;
+    project_id: int
 
 class NoteUpdateIn(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
-    project_id: int;
+    project_id: int
 
 
 class NoteOut(BaseModel):
@@ -119,7 +130,7 @@ class NoteOut(BaseModel):
     title: str
     content: Optional[str]
     owner_id: int
-    project_id: int;
+    project_id: int
 
     created_at: datetime
     updated_at: datetime

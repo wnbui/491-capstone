@@ -112,6 +112,14 @@ VALUES (
         'scrypt:32768:8:1$uioYetUzmimVA7zK$e92dedf04b8d2bafd03adcd1b2edfe877fa548f29f5d6cca24efc4f02afe1bdbba67f37954ff9ea1bd43b88bb3f5253d5067db76f1c5f70794dae9c20de25072',
         'user',
         '2024-12-31 03:38:27'
+    ),
+    (
+        'Test User',
+        'testuser',
+        'test@example.com',
+        'scrypt:32768:8:1$Ayk6SwKJLN5aA20K$2a0ce0202e11d81e57e9193da32aa87eb2aed1d476e5848abfb2e6df27141d54556a7d0a7e3afcbaae69b17c7173e7d8335c074397269b1f179a27b8277ad323',
+        'user',
+        '2025-01-01 00:00:00'
     );
 
 -- Insert projects
