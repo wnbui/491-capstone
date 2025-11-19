@@ -307,3 +307,9 @@ dist
 ../.DS_Store
 .DS_Store
 app/.DS_Store
+
+cypress/results
+mochawesome-report
+cypress/videos
+cypress/screenshots
+cypress/downloads
