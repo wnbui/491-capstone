@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, ListTodo, Archive, ArchiveRestore } from 'lucide-react';
+import { Plus, ListTodo, Archive, ArchiveRestore, Edit } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { getProject, getProjectTasks, createTask, updateTask, deleteTask, updateProject } from '../services/api';
 import { Header } from '../components/layout/Header';
@@ -11,6 +11,7 @@ import { TaskForm } from '../components/tasks/TaskForm';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Button } from '../components/common/Button';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { ProjectEditModal } from '../components/projects/ProjectEditModal';
 
 export const ProjectDetailPage = ({ projectId, onNavigate }) => {
   const { token } = useAuth();
@@ -21,6 +22,7 @@ export const ProjectDetailPage = ({ projectId, onNavigate }) => {
   const [loading, setLoading] = useState(true);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     fetchProjectData();
@@ -77,6 +79,12 @@ export const ProjectDetailPage = ({ projectId, onNavigate }) => {
     }
   };
 
+  const handleUpdateProject = async (projectData) => {
+    await updateProject(projectId, projectData, token);
+    setShowEditModal(false);
+    await fetchProjectData();
+  };
+
   const isArchived = project?.status === 'archived';
 
   if (loading) {
@@ -105,6 +113,13 @@ export const ProjectDetailPage = ({ projectId, onNavigate }) => {
                   )}
                 </div>
                 <div className="flex items-center gap-3">
+                  <Button
+                    onClick={() => setShowEditModal(true)}
+                    variant="ghost"
+                  >
+                    <Edit size={20} className="mr-2 inline" />
+                    Edit Project
+                  </Button>
                   <button
                     onClick={() => setShowArchiveModal(true)}
                     className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition cursor-pointer"
@@ -160,6 +175,13 @@ export const ProjectDetailPage = ({ projectId, onNavigate }) => {
           onCancel={() => setShowTaskModal(false)}
         />
       </Modal>
+
+      <ProjectEditModal
+        project={project}
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onUpdate={handleUpdateProject}
+      />
 
       <Modal
         isOpen={showArchiveModal}
