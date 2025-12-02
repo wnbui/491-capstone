@@ -26,7 +26,7 @@ This is the mono repository for our 491 Capstone project. The file structure is 
 
 ### DevOps & Testing
 - **GitHub Actions** - CI/CD workflow to test commits, PR, and merges
-- **Cypress** - Light weight end-to-end testing for JaveScript based web apps
+- **Cypress** - Light weight end-to-end testing for JavaScript based web apps
 
 ## Setup Requirements
 - Node.js 18+
@@ -113,3 +113,27 @@ Frontend will run on: **http://localhost:5173**
 ## Log in as an existing user from the existing database
 All users have the same test password (**Password123!**). Log in using any of the 10 existing users from the database.
 
+## How to conduct End to End testing with Cypress
+
+1. Ensure that the frontend and backend development servers are running.
+
+2. Navigate to Cypress directory.
+```bash
+cd Cypress
+```
+
+3. Start Cypress with the following command.
+```bash
+npx cypress open
+```
+4. Select E2E Testing.
+   
+5. Select Chrome as the preferred browser for testing.
+   
+6. Select from the list of tests (login, project-flow, tasks-flow, etc.) to run the end to end test.
+
+7. From the Cypress sidebar, verify that that each step in the test either passes or fails.
+
+8. If the test fails, you can hover over the step to view the error message and recorded snapshot of the application before failure.
+
+9. If the test passes, exit the test and select another test.
