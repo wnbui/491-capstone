@@ -50,9 +50,6 @@ function App() {
       case 'notes':
         return <NotesPage onNavigate={navigate} />;
       
-      case 'files':
-        return <FilesPage onNavigate={navigate} />;
-      
       case 'settings':
         return <SettingsPage onNavigate={navigate} />;
 

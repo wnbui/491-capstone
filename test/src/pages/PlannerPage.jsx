@@ -10,6 +10,7 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { Modal } from '../components/common/Modal';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import EventForm from "../components/planner/EventForm";
+import { Calendar } from 'lucide-react';
 
 function formatDateToBackendLocal(date) {
   if (!date) return null;
@@ -93,8 +94,9 @@ export const PlannerPage = ({ onNavigate }) => {
                 <Sidebar activePage="planner" onNavigate={onNavigate} />
 
                 <main className="flex-1 p-6">
-                    <h2 className="text-2xl font-bold mb-4">
-                        Planner
+                    <h2 className="text-2xl font-bold text-grey-900 flex items-center space-x-2">
+                        <Calendar size={28} />
+                        <span>Planner</span>
                     </h2>
                     <FullCalendar
                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

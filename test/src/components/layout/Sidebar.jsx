@@ -6,7 +6,6 @@ export const Sidebar = ({ activePage, onNavigate }) => {
     { id: 'tasks', label: 'Tasks', icon: ListTodo, page: 'tasks' },
     { id: 'planner', label: 'Planner', icon: Calendar, page: 'planner' },
     { id: 'notes', label: 'Notes', icon: FileText, page: 'notes' },
-    { id: 'files', label: 'Upload Files', icon: Upload, page: 'files' },
     { id: 'settings', label: 'Settings', icon: Settings, page: 'settings' }
   ];
 

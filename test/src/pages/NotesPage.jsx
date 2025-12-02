@@ -367,13 +367,13 @@ export const NotesPage = ({ onNavigate }) => {
           {/* Header with Title and New Note Button */}
           <div className="bg-white border-b border-gray-200 px-8 py-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-blue-700 flex items-center space-x-2">
+              <h2 className="text-2xl font-bold text-grey-900 flex items-center space-x-2">
                 <BookOpen size={28} />
                 <span>Notes</span>
               </h2>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors font-medium shadow-sm"
+                className="bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-500 transition-colors font-medium shadow-sm"
               >
                 <Plus size={20} />
                 New Note
